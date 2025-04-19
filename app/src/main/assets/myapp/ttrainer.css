@@ -1,0 +1,182 @@
+:root {
+    --page-col: #121212;
+    --text-col: #E0E0E0;
+    --link-col: #82AAFF;
+    --hover-col: #A0C8FF;
+    --navbar-col: #1F1F1F;
+    --navbar-text-col: #E0E0E0;
+    --navbar-border-col: #333333;
+    --footer-col: #1F1F1F;
+    --footer-text-col: #CCCCCC;
+    --footer-link-col: #82AAFF;
+    --footer-hover-col: #A0C8FF;
+
+    --backs-col: #325232;
+    --backn-col: #424242;
+    --backw-col: #545146;
+    --backe-col: #521212;
+
+    --code-col: #5696D6;
+    /*main color for all code*/
+    --code-back-col: #353535;
+    /*main background for all INLINE code*/
+    --code-img: linear-gradient(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08) 1.5em, rgba(255, 255, 255, 0.02) 1.5em, rgba(255, 255, 255, 0.02) 1.5em);
+
+    --code-met-col: #DCDCAA;
+    --code-keyw-col: #D8A0DF;
+    --code-bracets-col: #EEEEDD;
+    --code-vars-col: #9CDCFE;
+    --code-comments-col: #85CC85;
+    --code-numbers-col: #B5CEA8;
+    --code-types-col: #5696D6;
+    --tab-nth-child: #222222;
+}
+
+html{
+    background-color: var(--page-col);
+    color: var(--text-col);
+}
+#canvas-container {
+    position: relative;
+    border: none;
+    background-color: var(--page-col);
+}
+
+canvas {
+    display: block;
+}
+
+#answer-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 3px;
+    box-sizing: border-box;
+    padding: 25px;
+    /* margin: 5px; */
+}
+
+/* .btn {
+    padding: 10px 20px;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    background-color: rgb(237, 237, 208);
+    color: black;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+    .btn:hover {
+        background-color: #3367d6;
+    } */
+
+#status-message {
+    font-size: 3rem;
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    height: 60px;
+    color: #daa;
+    background-color: transparent;
+}
+
+#results {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: var(--page-col);
+    max-width: 380px;
+    width: 90%;
+    display: flex;
+}
+
+.results-head {
+    white-space: pre-line;
+    color: var(--code-comments-col);
+    font-size: 1.3em;
+}
+
+#result-text {
+    white-space: pre-line;
+    color: var(--code-comments-col);
+    font-size: 1.3em;
+}
+
+.device-toggle {
+    margin-bottom: 20px;
+}
+
+.hidden {
+    display: none;
+    visibility: hidden;
+}
+
+#name-input {
+    margin: 20px 0;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 250px;
+}
+
+button {
+    padding: 15px 8px;
+    font-size: 18px;
+    background-color: var(--backn-col);
+    color: var(--text-col);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #36648B;
+}
+
+.math-button {
+    display: inline-block;
+    /* background-color: #000; */
+    margin: 0;
+}
+
+/* Increase the size of MathJax output */
+.MathJax {
+    font-weight: bold;
+    font-size: 120% !important;
+
+    padding-top: 0em;
+    padding-left: 0.1em;
+    padding-right: 0.1em;
+    padding-bottom: 0em;
+    /* background-color: var(--backn-col); */
+}
+
+/* table formatting */
+.table-en {
+    /* to override rtl on any section that needs ltr */
+    direction: ltr;
+}
+
+.table-he {
+    /* to overide ltr on any section that needs rtl */
+    direction: rtl;
+    text-align: right;
+}
+
+table {
+    border-color: #444444 !important;
+}
+
+table td,
+th {
+    border-color: #333333 !important;
+
+    border-bottom-color: #775555 !important;
+}
+
+table tr:nth-child(2n) {
+    background-color: var(--tab-nth-child);
+}

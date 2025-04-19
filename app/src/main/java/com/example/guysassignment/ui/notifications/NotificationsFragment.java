@@ -47,6 +47,7 @@ public class NotificationsFragment extends Fragment {
         });
 
         // Observe the three shared values and rebuild the dashboard text
+        // 1) change your Observer type to Integer
         Observer<Integer> rebuild = scoreX10 -> {
             String name   = sharedVM.getName().getValue();
             String family = sharedVM.getFamilyName().getValue();
@@ -63,6 +64,11 @@ public class NotificationsFragment extends Fragment {
                 binding.textNotifications.setText(combined);
             }
         };
+
+// 3) hook it to the new LiveData
+        sharedVM.getBestScoreX10().observe(getViewLifecycleOwner(), rebuild);
+        sharedVM.getName()      .observe(getViewLifecycleOwner(), s -> rebuild.onChanged(sharedVM.getBestScoreX10().getValue()));
+        sharedVM.getFamilyName().observe(getViewLifecycleOwner(), s -> rebuild.onChanged(sharedVM.getBestScoreX10().getValue()));
 
         // 3) hook it to the new LiveData
         sharedVM.getBestScoreX10().observe(getViewLifecycleOwner(), rebuild);

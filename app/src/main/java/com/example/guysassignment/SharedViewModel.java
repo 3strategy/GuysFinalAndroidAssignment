@@ -1,6 +1,6 @@
 /// SharedViewModel.java
 /// Prompting: Guy S, on 4o-mini-high
-// Puspose: share name, family name, best_score,
+// Purpose: share name, family name, best_score,
 // across fragments and across sessions (persist data)
 /// https://chatgpt.com/share/68034575-9bcc-800e-abcb-86be4ecae071
 /// personal link:https://chatgpt.com/c/6802507d-21c4-800e-9102-12ad1933807a
@@ -14,6 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+
+import java.util.Objects;
 
 public class SharedViewModel extends AndroidViewModel {
     private static final String PREFS = "user_prefs";
@@ -52,7 +54,7 @@ public class SharedViewModel extends AndroidViewModel {
 
         // listen for external edits (if any)
         prefs.registerOnSharedPreferenceChangeListener((sp, key) -> {
-            switch (key) {
+            switch (Objects.requireNonNull(key)) {
                 case KEY_NAME:
                     name.postValue(sp.getString(KEY_NAME, ""));
                     break;
@@ -75,10 +77,6 @@ public class SharedViewModel extends AndroidViewModel {
         return familyName;
     }
 
-    public LiveData<Integer> getBestScore() {
-        return bestScore;
-    }
-
     // Call these to update & persist
     public void setName(String newName) {
         prefs.edit().putString(KEY_NAME, newName).apply();
@@ -88,7 +86,4 @@ public class SharedViewModel extends AndroidViewModel {
         prefs.edit().putString(KEY_FAMILY, newFamily).apply();
     }
 
-    public void setBestScore(int score) {
-        prefs.edit().putInt(KEY_SCORE, score).apply();
-    }
 }

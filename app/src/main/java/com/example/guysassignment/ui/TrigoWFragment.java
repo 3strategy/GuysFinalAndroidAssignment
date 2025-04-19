@@ -136,7 +136,7 @@ public class TrigoWFragment extends Fragment {
         public void updateLocalScore(int score) {
             // this runs on a background thread, so post to main:
             new Handler(Looper.getMainLooper()).post(() -> {
-                vm.setBestScore(score);
+                vm.setBestScoreX10(score * 10);
             });
         }
     }

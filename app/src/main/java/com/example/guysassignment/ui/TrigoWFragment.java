@@ -140,13 +140,13 @@ public class TrigoWFragment extends Fragment {
          * Expects scoreX10 (e.g. for 2.5, pass 25)
          */
         @JavascriptInterface
-        public void updateLocalScore(int score) {
+        public void updateLocalScore(double score) {
             // 1) log the raw value coming from JS
-            Log.d(TAG, "updateLocalScore() called with raw score=" + score);
+            //Log.d(TAG, "updateLocalScore() called with raw score=" + score);
 
             // 2) post to main thread and log the transformed value
             mainHandler.post(() -> {
-                int scoreX10 = score * 10;
+                int scoreX10 = (int)(score * 10);
                 Log.d(TAG, "Posting to main thread: scoreX10=" + scoreX10);
                 vm.setBestScoreX10(scoreX10);
             });

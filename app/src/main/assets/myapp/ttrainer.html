@@ -367,31 +367,45 @@
 
             // Create a query to check if a document with the same name and gameID exists
             const q = query(
-                collection(db, "allTimeRecords"),
-                where("name", "==", name),
-                where("gameID", "==", gameID)
+              collection(db, "allTimeRecords"),
+              where("name", "==", name),
+              where("gameID", "==", gameID)
             );
 
             const querySnapshot = await getDocs(q);
 
             if (querySnapshot.empty) {
-                // No existing document: add a new one.
-                const docRef = await addDoc(collection(db, "allTimeRecords"), {
-                    name: name,
-                    score: numericScore, // now stored as a number
-                    gameID: gameID,
-                    dateAchieved: serverTimestamp()
-                });
-                console.log("Document written with ID: ", docRef.id);
-            } else {
-                // Document exists: update the first matching document.
-                const docRef = querySnapshot.docs[0].ref;
-                await updateDoc(docRef, {
-                    score: numericScore, // update with numeric score
-                    dateAchieved: serverTimestamp()
-                });
-                console.log("Document updated with ID: ", querySnapshot.docs[0].id);
+              // No existing document: add a new one.
+              const docRef = await addDoc(collection(db, "allTimeRecords"), {
+                name: name,
+                score: numericScore,
+                gameID: gameID,
+                dateAchieved: serverTimestamp()
+              });
+              console.log("Document written with ID:", docRef.id);
 
+            } else {
+              // Document exists: check current stored score first
+              const docSnapshot = querySnapshot.docs[0];
+              const docRef = docSnapshot.ref;
+              const existingScore = docSnapshot.data().score; // pulled from Firestore
+
+              if (numericScore < existingScore) {
+                // only update when new score is better (i.e. lower time)
+                await updateDoc(docRef, {
+                  score: numericScore,
+                  dateAchieved: serverTimestamp()
+                });
+                console.log(
+                  `Document updated (better score ${numericScore} replaces ${existingScore}) — ID:`,
+                  docSnapshot.id
+                );
+              } else {
+                // new score is worse or equal, so do nothing
+                console.log(
+                  `No update: existing score ${existingScore} is better than new score ${numericScore}`
+                );
+              }
             }
         } catch (error) {
             console.error("Error adding/updating document: ", error);

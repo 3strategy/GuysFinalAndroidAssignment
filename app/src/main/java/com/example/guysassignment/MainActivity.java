@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -59,10 +60,10 @@ public class MainActivity extends AppCompatActivity {
         // added data initialization for testing:
         // Since data persists using androids SharedPreferences this initialization code only needs to be run once.
         // After that, lines should be commented and data will be fetched from the SharedPreferences .
-        //        SharedViewModel vm = new ViewModelProvider(this).get(SharedViewModel.class);
-        //        vm.setName("Guy");
-        //        vm.setFamilyName("Siedes");
-        //        vm.setBestScore(42);
+//                SharedViewModel vm = new ViewModelProvider(this).get(SharedViewModel.class);
+//                vm.setName("Guy");
+//                vm.setFamilyName("Siedes");
+//                vm.setBestScore(62);
 
 
         // ===================== sensor usage סנסורים וחיישנים ========================

@@ -2,6 +2,7 @@ package com.example.guysassignment.ui.notifications;
 
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,8 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.guysassignment.SharedViewModel;
 import com.example.guysassignment.databinding.FragmentNotificationsBinding;
-import com.example.guysassignment.ui.notifications.NotificationsViewModel;
+
+import java.util.Locale;
 
 public class NotificationsFragment extends Fragment {
     private FragmentNotificationsBinding binding;
@@ -44,23 +46,28 @@ public class NotificationsFragment extends Fragment {
             }
         });
 
-        // Observe the three shared values and rebuild the Notifications text
-        Observer<Object> rebuild = o -> {
-            String name = sharedVM.getName().getValue();
+        // Observe the three shared values and rebuild the dashboard text
+        Observer<Integer> rebuild = scoreX10 -> {
+            String name   = sharedVM.getName().getValue();
             String family = sharedVM.getFamilyName().getValue();
-            int score = sharedVM.getBestScore().getValue();
+            // 2) unwrap the ×10 value and divide by 10.0 for one decimal
+            double displayScore = (scoreX10 != null ? scoreX10 / 10.0 : 0.0);
 
-            if (!name.isEmpty() || !family.isEmpty() || score != 0) {
-                String combined = "Nofications Fragment:\n" +
-                        "Name: " + name + "\n"
-                        + "Family: " + family + "\n"
-                        + "Best score: " + score;
-                tv.setText(combined);
+            // only show when something’s been set
+            if (!TextUtils.isEmpty(name) || !TextUtils.isEmpty(family) || displayScore != 0.0) {
+                String combined = "Dashboard Fragment:\n" +
+                        "Name: "   + (name   == null ? "" : name)   + "\n" +
+                        "Family: " + (family == null ? "" : family) + "\n" +
+                        String.format(Locale.getDefault(),
+                                "Best score: %.1f", displayScore);
+                binding.textNotifications.setText(combined);
             }
         };
-        sharedVM.getName().observe(getViewLifecycleOwner(), rebuild);
-        sharedVM.getFamilyName().observe(getViewLifecycleOwner(), rebuild);
-        sharedVM.getBestScore().observe(getViewLifecycleOwner(), rebuild);
+
+        // 3) hook it to the new LiveData
+        sharedVM.getBestScoreX10().observe(getViewLifecycleOwner(), rebuild);
+        sharedVM.getName()      .observe(getViewLifecycleOwner(), s -> rebuild.onChanged(sharedVM.getBestScoreX10().getValue()));
+        sharedVM.getFamilyName().observe(getViewLifecycleOwner(), s -> rebuild.onChanged(sharedVM.getBestScoreX10().getValue()));
 
         return binding.getRoot();
     }

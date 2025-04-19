@@ -20,20 +20,35 @@ public class SharedViewModel extends AndroidViewModel {
     private static final String KEY_NAME = "name";
     private static final String KEY_FAMILY = "family_name";
     private static final String KEY_SCORE = "best_score";
+    private final MutableLiveData<Integer> bestScoreX10 = new MutableLiveData<>();
 
     private final SharedPreferences prefs;
     private final MutableLiveData<String> name = new MutableLiveData<>();
     private final MutableLiveData<String> familyName = new MutableLiveData<>();
     private final MutableLiveData<Integer> bestScore = new MutableLiveData<>();
 
+    public LiveData<Integer> getBestScoreX10() {
+        return bestScoreX10;
+    }
+
+    public void setBestScoreX10(int scoreX10) {
+        prefs.edit().putInt(KEY_SCORE, scoreX10).apply();
+        bestScoreX10.setValue(scoreX10);
+    }
+
     public SharedViewModel(@NonNull Application app) {
         super(app);
         prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        // Load stored value or default to 0
+        bestScoreX10.setValue(prefs.getInt(KEY_SCORE, 0));
 
         // initialize from prefs (if missing, default to empty / 0)
         name.setValue(prefs.getString(KEY_NAME, "— no name set —"));
         familyName.setValue(prefs.getString(KEY_FAMILY, "— no family name set —"));
         bestScore.setValue(prefs.getInt(KEY_SCORE, -1));
+
+
+
 
         // listen for external edits (if any)
         prefs.registerOnSharedPreferenceChangeListener((sp, key) -> {

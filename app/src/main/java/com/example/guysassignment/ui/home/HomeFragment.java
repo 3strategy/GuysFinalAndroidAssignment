@@ -11,9 +11,10 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.guysassignment.R;
 import com.example.guysassignment.SharedViewModel;
 import com.example.guysassignment.databinding.FragmentHomeBinding;
+
+import java.util.Locale;
 
 public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
@@ -22,25 +23,28 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Scoped to the Activity so it's shared across all fragments
         sharedVM = new ViewModelProvider(requireActivity())
                 .get(SharedViewModel.class);
     }
-
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
-        View view = binding.getRoot();
 
         // Initialize fields from saved prefs
         binding.editName.setText(sharedVM.getName().getValue());
         binding.editFamily.setText(sharedVM.getFamilyName().getValue());
 
-        // Observe bestScore and update the label
-        sharedVM.getBestScore().observe(getViewLifecycleOwner(), score -> binding.textBestScore.setText(getString(R.string.best_score) + score));
+        // Observe bestScoreX10 and update the label
+        sharedVM.getBestScoreX10().observe(getViewLifecycleOwner(), scoreX10 -> {
+            double displayScore = scoreX10 / 10.0;
+            binding.textBestScore.setText(
+                    String.format(Locale.getDefault(),
+                            "Best score: %.1f", displayScore)
+            );
+        });
 
         // Push user changes back to SharedViewModel
         binding.editName.addTextChangedListener(new TextWatcher() {
@@ -59,7 +63,7 @@ public class HomeFragment extends Fragment {
             @Override public void afterTextChanged(Editable e) {}
         });
 
-        return view;
+        return binding.getRoot();
     }
 
     @Override

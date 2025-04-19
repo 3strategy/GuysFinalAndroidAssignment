@@ -8,15 +8,25 @@ package com.example.guysassignment.ui;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.ConsoleMessage;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.example.guysassignment.R;
+import com.example.guysassignment.SharedViewModel;
+import android.os.Handler;
+import android.os.Looper;
+
+// To expose Java methods to your WebView’s JavaScript
+import android.webkit.JavascriptInterface;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,6 +35,7 @@ import com.example.guysassignment.R;
  */
 public class TrigoWFragment extends Fragment {
 
+    private SharedViewModel sharedVM;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -59,6 +70,9 @@ public class TrigoWFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Scoped to the Activity so it's shared across all fragments
+        sharedVM = new ViewModelProvider(requireActivity())
+                .get(SharedViewModel.class);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -81,6 +95,26 @@ public class TrigoWFragment extends Fragment {
         // 4. ensure links load in the WebView, not in the browser
         web.setWebViewClient(new WebViewClient());
 
+        //4b connect with JSBridge to allowe writing to local storage database:
+        web.addJavascriptInterface(
+                new JSBridge(sharedVM),   // your SharedViewModel instance
+                "Android"                 // the name JS will see
+        );
+
+        // 4c enable debugging web:
+        web.setWebContentsDebuggingEnabled(true);
+
+
+        web.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onConsoleMessage(ConsoleMessage msg) {
+                Log.d("WebViewJS", msg.message() + " -- From line "
+                        + msg.lineNumber() + " of " + msg.sourceId());
+                return true;
+            }
+        });
+
+
         // 5. load your HTML app
         //    – if it lives in app/src/main/assets/myapp/index.html:
         web.loadUrl("file:///android_asset/myapp/ttrainer.html");
@@ -89,4 +123,23 @@ public class TrigoWFragment extends Fragment {
 
         return view;
     }
+
+
+    private class JSBridge {
+        private final SharedViewModel vm;
+
+        JSBridge(SharedViewModel vm) {
+            this.vm = vm;
+        }
+
+        @JavascriptInterface
+        public void updateLocalScore(int score) {
+            // this runs on a background thread, so post to main:
+            new Handler(Looper.getMainLooper()).post(() -> {
+                vm.setBestScore(score);
+            });
+        }
+    }
+
+
 }

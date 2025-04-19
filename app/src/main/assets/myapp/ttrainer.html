@@ -12,7 +12,8 @@
 </head>
 
 <body>
-<h2 class="mb-4"><input style="max-width: 90%;" type="text" id="name-input" placeholder="שם: " /></h2>
+<h2 class="mb-4"><input style="max-width: 90%;" type="text" id="name-input" placeholder="שם: "/>
+</h2>
 
 <div id="answer-buttons" class="math-button">
     <!-- must have btn class to be clickable -->
@@ -26,20 +27,23 @@
 <div id="canvas-container" style="position: relative;">
     <canvas id="canvas"></canvas>
     <!-- Status message: centered both horizontally and vertically over the canvas -->
-    <div id="status-message" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+    <div id="status-message"
+         style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
     <!-- Results div: anchored to the left edge and vertically centered -->
     <div id="results" class="hidden" style="position: absolute;display: flex;
   flex-direction: column; top: 30%; left: 0; transform: translateY(-50%);">
         <h2 class="results-head">תוצאות:</h2>
         <div id="result-text"></div>
-        <button id="restart-btn" class="btnn" style="margin-top: 15px; background-color: #0f9d58;">Restart</button>
+        <button id="restart-btn" class="btnn" style="margin-top: 15px; background-color: #0f9d58;">
+            Restart
+        </button>
     </div>
 </div>
 
 <div id="answer-buttons1" class="math-button">
 
 
-    <button class="btnn" data-value="9" >Finish</button>
+    <button class="btnn" data-value="9">Finish</button>
 </div>
 <button id="showLeaderboard">Show Leaderboard</button>
 <div id="leaderboard"></div>
@@ -281,12 +285,14 @@
         resultString += t22 > 0 ? `\n${c22} חלוקות קוסינוס נכונות (${(100 * c22 / t22).toFixed(1)}%)` : `\nחלוקות קוסינוס - אין`;
         resultString += (t11 + t22) > 0 ? `\nזמן ממוצע בחלוקות: ${(td / (t11 + t22)).toFixed(1)}` : `\nזמן ממוצע בחלוקות: אין`;
         resultString += (t1 + t2) > 0 ? `\nזמן ממוצע במכפלות: ${(tm / (t1 + t2)).toFixed(1)}` : `\nזמן ממוצע במכפלות: אין`;
-        if (total > 10 && counter / total > 0.9)
+        console.log("evaluating whether to call addResult");
+        if (total > 6 && counter / total > 0.6)
           addResult(name, score); //write good scores to firebase
         // Use innerHTML and replace newlines with <br> for proper line breaks in HTML
         resultText.innerHTML = resultString.replace(/\n/g, "<br>");
         resultsDiv.classList.remove("hidden");
         sendResultsToTelegram(resultString, name);
+
       }
 
       async function sendResultsToTelegram(results, name) {
@@ -343,10 +349,25 @@
 
 
     async function addResult(name, score) {
+    console.log("addResult called");
   const gameID = 1;  // You can make this a parameter if needed.
   try {
     // Convert score to a number to ensure correct type
     const numericScore = Number(score);
+
+
+      // ========================= update ANDROID STORAGE ============================
+      // =============================================================================
+      // tell Android to persist the current score locally
+
+      console.log("About to call updateLocalScore with", numericScore);
+        if (window.Android && window.Android.updateLocalScore) {
+          window.Android.updateLocalScore(numericScore * 10);
+          console.log("Called Android.updateLocalScore()");
+        } else {
+          console.error("Android.updateLocalScore not available!");
+        }
+
 
     // Create a query to check if a document with the same name and gameID exists
     const q = query(
@@ -374,6 +395,7 @@
         dateAchieved: serverTimestamp()
       });
       console.log("Document updated with ID: ", querySnapshot.docs[0].id);
+
     }
   } catch (error) {
     console.error("Error adding/updating document: ", error);
@@ -400,6 +422,8 @@
           top: document.body.scrollHeight,
           behavior: 'smooth'
         });
+
+
 
       } catch (error) {
         console.error("Error fetching leaderboard:", error);

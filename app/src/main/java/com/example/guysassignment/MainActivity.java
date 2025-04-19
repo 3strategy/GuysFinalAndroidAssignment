@@ -6,8 +6,13 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,6 +31,13 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
     private static final int NOTIFICATION_PERMISSION_REQUEST_CODE = 1;
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
+    private float lastX, lastY, lastZ;
+    private long lastUpdate = 0;
+    private static final int SHAKE_THRESHOLD = 800;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +64,21 @@ public class MainActivity extends AppCompatActivity {
         //        vm.setFamilyName("Siedes");
         //        vm.setBestScore(42);
 
+
+        // ===================== sensor usage סנסורים וחיישנים ========================
+        // ============================================================================
+
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        if (accelerometer != null) {
+            sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_UI);
+        } else {
+            Toast.makeText(this, "Accelerometer not available!", Toast.LENGTH_SHORT).show();
+        }
+        // ================ end of accelerometer סנסורים וחיישנים =====================
+
+
+
         // ALARMS & NOTIFICATIONS ===============================
         // check for permissions
         try {
@@ -67,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setDailyReminder();
-
+        // ============================= End of alarms and notifications
 
 
 
@@ -99,6 +126,54 @@ public class MainActivity extends AppCompatActivity {
         {
             Log.d("setDailyRem", "Exception in setDaily ");
         }
+    }
+
+
+    // ============ sensor events ==============================
+    // =========================================================
+    private final SensorEventListener sensorEventListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                long currentTime = System.currentTimeMillis();
+                if ((currentTime - lastUpdate) > 100) { // sample every 100 ms
+                    long timeDifference = (currentTime - lastUpdate);
+                    lastUpdate = currentTime;
+
+                    float x = event.values[0];
+                    float y = event.values[1];
+                    float z = event.values[2];
+                    float deltaX = x - lastX;
+                    float deltaY = y - lastY;
+                    float deltaZ = z - lastZ;
+                    float acceleration = (deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ) / timeDifference * 10000;
+
+                    if (acceleration > SHAKE_THRESHOLD) {
+                        Toast.makeText(MainActivity.this, "Shake detected! Closing application...", Toast.LENGTH_SHORT).show();
+                        finish(); // close the application
+                    }
+
+                    lastX = x;
+                    lastY = y;
+                    lastZ = z;
+                }
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            // not required here
+        }
+    };
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(sensorEventListener);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_UI);
     }
 
 }

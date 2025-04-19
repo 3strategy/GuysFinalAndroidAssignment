@@ -17,20 +17,29 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.GuysAssignment">
+
+        <activity
+            android:name=".MenuActivity"
+            android:label="Menu"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Your existing fragment‐host -->
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name" />
+
+        <!-- The wizard‐generated wallet screen -->
         <activity
             android:name=".WalletActivity"
             android:exported="false"
             android:label="@string/title_activity_wallet"
             android:theme="@style/Theme.GuysAssignment" />
-        <activity
-            android:name=".MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
 
         <receiver
             android:name=".AlarmReceiver"

@@ -84,11 +84,24 @@ public class WalletActivity extends AppCompatActivity {
      * @see PayClient#savePasses(String, Activity, int)
      */
     private void onAddToWalletClicked() {
+        // “issuer@example.com” just needs the form of an email
+        String issuerEmail = "issuer@example.com";
+
+        // must be a purely numeric string
+        String issuerId    = "1234567890";
+
+        // classId = issuerId + "." + your chosen suffix (alphanumeric, “.”, “_” or “-” only) :contentReference[oaicite:0]{index=0}
+        String classId     = issuerId + ".PracticeClass";
+
+        // objectId must also be unique per user; here we use a UUID suffix
+        String objectId    = issuerId + ".PracticeObject_" + UUID.randomUUID();
+
+
         final SamplePass samplePass = new SamplePass(
-                "",  // TODO(you) – Enter issuer email address
-                "",    // TODO(you) – Enter issuer id
-                "",  // TODO(you) – Enter pass class
-                UUID.randomUUID().toString()
+                issuerEmail,
+                issuerId,
+                classId,
+                objectId
         );
 
         walletClient.savePasses(

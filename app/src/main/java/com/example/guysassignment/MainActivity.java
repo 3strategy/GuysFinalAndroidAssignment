@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
 
                     if (acceleration > SHAKE_THRESHOLD) {
                         Toast.makeText(MainActivity.this, "Shake detected! Closing application...", Toast.LENGTH_SHORT).show();
-                        finish(); // close the application
+                        finishAffinity(); // close the application
                     }
 
                     lastX = x;

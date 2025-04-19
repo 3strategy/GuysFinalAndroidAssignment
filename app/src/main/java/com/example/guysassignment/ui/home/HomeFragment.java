@@ -1,68 +1,65 @@
 package com.example.guysassignment.ui.home;
 
-
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.guysassignment.SharedViewModel;
 import com.example.guysassignment.databinding.FragmentHomeBinding;
-import com.example.guysassignment.ui.home.HomeViewModel;
 
 public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private SharedViewModel sharedVM;
-    private HomeViewModel dashVM;
 
     @Override
-    public void onCreate(Bundle saved) {
-        super.onCreate(saved);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Scoped to the Activity so it's shared across all fragments
         sharedVM = new ViewModelProvider(requireActivity())
                 .get(SharedViewModel.class);
-        dashVM = new ViewModelProvider(this)
-                .get(HomeViewModel.class);
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle saved) {
+                             ViewGroup container,
+                             Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
-        TextView tv = binding.textHome;
+        View view = binding.getRoot();
 
-        // Observe the old default text, too:
-        dashVM.getText().observe(getViewLifecycleOwner(), defaultText -> {
-            // if no name has been set yet, show the default
-            if (sharedVM.getName().getValue().isEmpty()) {
-                tv.setText(defaultText);
-            }
+        // Initialize fields from saved prefs
+        binding.editName.setText(sharedVM.getName().getValue());
+        binding.editFamily.setText(sharedVM.getFamilyName().getValue());
+
+        // Observe bestScore and update the label
+        sharedVM.getBestScore().observe(getViewLifecycleOwner(), score -> {
+            binding.textBestScore.setText("Best score: " + score);
         });
 
-        // Observe the three shared values and rebuild the Home text
-        Observer<Object> rebuild = o -> {
-            String name = sharedVM.getName().getValue();
-            String family = sharedVM.getFamilyName().getValue();
-            int score = sharedVM.getBestScore().getValue();
-
-            if (!name.isEmpty() || !family.isEmpty() || score != 0) {
-                String combined = "Home Fragment:\n" +
-                        "Name: " + name + "\n"
-                        + "Family: " + family + "\n"
-                        + "Best score: " + score;
-                tv.setText(combined);
+        // Push user changes back to SharedViewModel
+        binding.editName.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
+            @Override public void onTextChanged(CharSequence s, int st, int b, int c) {
+                sharedVM.setName(s.toString());
             }
-        };
-        sharedVM.getName().observe(getViewLifecycleOwner(), rebuild);
-        sharedVM.getFamilyName().observe(getViewLifecycleOwner(), rebuild);
-        sharedVM.getBestScore().observe(getViewLifecycleOwner(), rebuild);
+            @Override public void afterTextChanged(Editable e) {}
+        });
 
-        return binding.getRoot();
+        binding.editFamily.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
+            @Override public void onTextChanged(CharSequence s, int st, int b, int c) {
+                sharedVM.setFamilyName(s.toString());
+            }
+            @Override public void afterTextChanged(Editable e) {}
+        });
+
+        return view;
     }
 
     @Override

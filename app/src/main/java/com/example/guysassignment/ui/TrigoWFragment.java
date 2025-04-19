@@ -125,20 +125,51 @@ public class TrigoWFragment extends Fragment {
     }
 
 
-    private class JSBridge {
+    private static class JSBridge {
+        private static final String TAG = "JSBridge";
         private final SharedViewModel vm;
+
+        private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
         JSBridge(SharedViewModel vm) {
             this.vm = vm;
         }
 
+        /**
+         * Called from JS when a new score arrives.
+         * Expects scoreX10 (e.g. for 2.5, pass 25)
+         */
         @JavascriptInterface
         public void updateLocalScore(int score) {
-            // this runs on a background thread, so post to main:
-            new Handler(Looper.getMainLooper()).post(() -> {
-                vm.setBestScoreX10(score * 10);
+            // 1) log the raw value coming from JS
+            Log.d(TAG, "updateLocalScore() called with raw score=" + score);
+
+            // 2) post to main thread and log the transformed value
+            mainHandler.post(() -> {
+                int scoreX10 = score * 10;
+                Log.d(TAG, "Posting to main thread: scoreX10=" + scoreX10);
+                vm.setBestScoreX10(scoreX10);
             });
         }
+
+        /**
+         * Called from JS to retrieve the current name from SharedViewModel.
+         */
+        @JavascriptInterface
+        public String getName() {
+            String name = vm.getName().getValue();
+            //name += " " +vm.getFamilyName().getValue();
+            return name != null ? name : "";
+        }
+
+//        /**
+//         * Called from JS to retrieve the current family name from SharedViewModel.
+//         */
+//        @JavascriptInterface
+//        public String getFamilyName() {
+//            String family = vm.getFamilyName().getValue();
+//            return family != null ? family : "";
+//        }
     }
 
 

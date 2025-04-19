@@ -12,8 +12,7 @@
 </head>
 
 <body>
-<h2 class="mb-4"><input style="max-width: 90%;" type="text" id="name-input" placeholder="שם: " />
-</h2>
+
 
 <div id="answer-buttons" class="math-button">
     <!-- must have btn class to be clickable -->
@@ -64,7 +63,7 @@
         const statusMessage = document.getElementById("status-message");
         const resultsDiv = document.getElementById("results");
         const resultText = document.getElementById("result-text");
-        const nameInput = document.getElementById("name-input");
+
 
         // Tracking variables
         let flag = true;
@@ -275,7 +274,9 @@
         function showResults() {
             ctx.fillStyle = cblack;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            const name = nameInput.value.trim() || "Anonymous";
+            // read the name
+            var name = window.Android.getName();
+
             let resultString = `תודה ${name}. ${counter} נכונות מתוך ${total}\n`;
             let score = (timetaken / Math.max(1, total)).toFixed(1)
             resultString += `זמן פתרון ממוצע: ${score}\n`;
@@ -285,8 +286,17 @@
             resultString += t22 > 0 ? `\n${c22} חלוקות קוסינוס נכונות (${(100 * c22 / t22).toFixed(1)}%)` : `\nחלוקות קוסינוס - אין`;
             resultString += (t11 + t22) > 0 ? `\nזמן ממוצע בחלוקות: ${(td / (t11 + t22)).toFixed(1)}` : `\nזמן ממוצע בחלוקות: אין`;
             resultString += (t1 + t2) > 0 ? `\nזמן ממוצע במכפלות: ${(tm / (t1 + t2)).toFixed(1)}` : `\nזמן ממוצע במכפלות: אין`;
+
+
+
+
+            // ========================= update ANDROID STORAGE ============================
+            if (window.Android && window.Android.updateLocalScore) //{
+                window.Android.updateLocalScore(Number(score)); // not x10. this should be handled behind.
+            // =============================================================================
+
             console.log("evaluating whether to call addResult");
-            if (total > 6 && counter / total > 0.6)
+            if (total > 5 && counter / total > 0.79)
                 addResult(name, score); //write good scores to firebase
             // Use innerHTML and replace newlines with <br> for proper line breaks in HTML
             resultText.innerHTML = resultString.replace(/\n/g, "<br>");
@@ -354,19 +364,6 @@
         try {
             // Convert score to a number to ensure correct type
             const numericScore = Number(score);
-
-
-            // ========================= update ANDROID STORAGE ============================
-            // =============================================================================
-            console.log("About to call updateLocalScore with", numericScore);
-            if (window.Android && window.Android.updateLocalScore) //{
-                window.Android.updateLocalScore(numericScore); // not x10. this should be handled behind.
-            //     console.log("Called Android.updateLocalScore()");
-            // } else {
-
-            //     console.error("Android.updateLocalScore not available!");
-            // }
-
 
             // Create a query to check if a document with the same name and gameID exists
             const q = query(

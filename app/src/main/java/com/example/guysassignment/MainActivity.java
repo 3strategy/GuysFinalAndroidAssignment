@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private Sensor accelerometer;
     private float lastX, lastY, lastZ;
     private long lastUpdate = 0;
-    private static final int SHAKE_THRESHOLD = 800;
+    private static final int SHAKE_THRESHOLD = 6800;
 
 
 

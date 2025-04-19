@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.guysassignment.R;
 import com.example.guysassignment.SharedViewModel;
 import com.example.guysassignment.databinding.FragmentHomeBinding;
 
@@ -26,6 +27,7 @@ public class HomeFragment extends Fragment {
                 .get(SharedViewModel.class);
     }
 
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
@@ -38,9 +40,7 @@ public class HomeFragment extends Fragment {
         binding.editFamily.setText(sharedVM.getFamilyName().getValue());
 
         // Observe bestScore and update the label
-        sharedVM.getBestScore().observe(getViewLifecycleOwner(), score -> {
-            binding.textBestScore.setText("Best score: " + score);
-        });
+        sharedVM.getBestScore().observe(getViewLifecycleOwner(), score -> binding.textBestScore.setText(getString(R.string.best_score) + score));
 
         // Push user changes back to SharedViewModel
         binding.editName.addTextChangedListener(new TextWatcher() {

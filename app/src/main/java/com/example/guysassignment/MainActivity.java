@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import androidx.core.view.WindowCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         com.example.guysassignment.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(binding.getRoot());
 
         //BottomNavigationView navView = findViewById(R.id.nav_view);

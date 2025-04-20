@@ -12,5 +12,8 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <!-- shrink the default ActionBar size from 56dp to 48dp: -->
+        <item name="android:actionBarSize">48dp</item>
+        <item name="actionBarSize">48dp</item>
     </style>
 </resources>
